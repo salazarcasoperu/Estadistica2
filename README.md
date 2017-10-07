@@ -4,6 +4,7 @@ Aquí encontrarás los scripts de las clases del curso POL304. Estadística para
 
 Espero que esta web te sea de ayuda. Cualquier duda, sugerencia, o comentario (¡y si notas algún error también!), escríbeme un correo a [patrick.salazar@pucp.edu.pe](mailto:patrick.salazar@pucp.edu.pe)
 
+[Prueba](https://rawgit.com/salazarcasoperu/Estadistica2/master/clase02.html)
 ____
 # Estadística para el Análisis Político 2 
 
