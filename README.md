@@ -1,4 +1,4 @@
-# Estadistica 2
+# Estadística 2
 
 ¡Hola! Bienvenida/o a esta web.
 
