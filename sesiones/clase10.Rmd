@@ -1,0 +1,147 @@
+#Modelamiento y Técnicas Predictivas
+
+Ustedes van a usar los modelos para buscar explicaciones. Que están fundamentadas en la teoría.
+
+Ejemplo: vas a tu clase X.
+
+Te dicen: la DEMOCRACIA. ¿Qué hay que hacer para que la democracia mejore?
+
+Tu democracia es tu variable Y. Y todas las X que se te ocurra, son aquellas cosas que tú crees impactarían la democracia (positiva o negativamente).
+
+Concepto más chiquito: democracia participativa. Y así... te vas a ir achicando más.
+
+En lo que te vas a romper la cabeza: cómo medir la Y.
+
+**La estadística no sabe lo que le estás metiendo**.
+[La responsabilidad de uno es buscar buenos conceptos]
+
+CUENTOS
+NUEVOS CUENTOS
+ENCONTRAR TU CUENTO
+
+En pregrado: no te piden que inventes una teoría.
+
+[Putnam, *Making Democracy Work*]
+
+**Busca la HIPÓTESIS**. Si se llama científico, ¿cuál es la hipótesis?
+
+*Democratic Governance*
+
+La estadística no se responsbiliza por el tipo de concepto. ESCALA.
+
+**Todo depende de la Y**
+
+Hipótesis: X1, X2, X3 y X4 impactan en la Y.
+
+Si solo cojo Y y X1 [y así de dos en dos]: **no estoy controlando**. Se puede tener una correlación espúrea: **NO ES LO QUE ESTÁS VIENDO, ES OTAR COSA**.
+
+1. **VALIDEZ MUESTRAL**: manera en que cualquier estadística se protege. R te puede decir: "lo que me has dado no es suficiente" [**ESO TIENE QUE VER CON EL P-VALOR**] ---> **SIGNIFICANCIA**
+
+[Todos los modelos requieren de una buena cantidad de datos]
+
+**La parte inferencial de la Estadística NO GENERALIZA TAN RÁPIDO**
+
+2. **SENTIDO** o **DIRECCIÓN**: *signos*: positivo (ayuda a la Y) o negativo (perjudica a la Y)
+
+
+**Los modelos están para hallar relaciones entre variables.**
+
+Primera parte del curso: explorando data comprehensiva [todos los distritos]. **por eso vale la pena hacer clusters**
+
+Las técnicas de dimensionalidad sirven para **analizar los casos**
+
+
+En los **modelos**, ***lo que nos importan son las columnas***
+
+3. **INTENSIDAD** o **FUERZA**
+
+[Nosotros estamos buscando sostener una teoría. No tanto predecir.]
+
+***
+
+Las Y tienen que sonar a que son resultado de algo. En nuestro ejemplo, nuestras Y son los votos por PPK y FP. Y lo demás, tiene que ver con Desarrollo Humano.
+
+Carguemos la data:
+
+```{r}
+folder='data'
+fileName='idh_elec.csv'
+fileToRead=file.path(folder,fileName)
+idh_elec=read.csv(fileToRead,strip.white = T,
+                  stringsAsFactors = F)
+```
+
+Veamos el TIPO de data que tenemos:
+
+```{r}
+str(idh_elec)
+```
+
+
+A ti, la ONU te dice que el IDH (siguiendo a Sen), es importante. Y que es una **latente** que contiene a: esperanza, secundaria, tiempoedu y percapitaf.
+
+Podría hacer Esta 1, y hacer que X sea IDH e Y sea PPK.
+
+Pero ahora, haciendo Esta 2, podríamos hacer que las X sean esperanza, secundaria, tiempoedu, percapitaf. Y la Y sigue siendo PPK.
+
+El primer Y que vamos a hacer son los votos de PPK.
+
+**En los exámenes**: tengo que tratar de **crear nuevas variables**
+
+```{r}
+idh_elec$ganappk=as.factor(ifelse(idh_elec$PPK>idh_elec$FP,1,0)) #pongo as.factor porque quiero que sea categórica
+#Añado etiquetas de valor
+levels(idh_elec$ganappk)=c('Keiko','PPK') #Primero 'Keiko' porque es 0; 'PPK' es 1
+```
+
+Creo un test:
+
+```{r}
+test=idh_elec[,c('ganappk','esperanza','secundaria','tiempoedu','percapitaf')]
+aggregate(cbind(esperanza,secundaria,tiempoedu,percapitaf) ~ ganappk, data=test,FUN=mean) #en cbind van las numéricas; después de ~ va la categórica; luego la data; y luego la función
+```
+
+**OJO**: acá pareciera que todo está controlado. Pero no lo está. [Recuerda gráfico de IPSOS que sostenía que (solo) el nivel educativo era lo que influía y diferenciaba el voto de Keiko y PPK]
+
+Exploremos esos grupos con más detalle:
+
+```{r}
+par(mfrow=c(2,2))
+boxplot(esperanza ~ ganappk, data=test,main='esperanza de vida')
+boxplot(secundaria ~ ganappk, data=test,main='secundaria')
+boxplot(tiempoedu ~ ganappk, data=test,main='años de educación')
+boxplot(percapitaf ~ ganappk, data=test,main='percapita familiar')
+```
+
+Si las colas de los boxplots no se chocasen [análogo a los intervalos de confianza, o a cuando hacíamos prueba t], ahí recién habría significancia.
+
+
+Ahora... **propongamos un modelo**:
+
+```{r}
+modeloDico <- glm(ganappk ~ ., 
+                 data = test, 
+                 family = "binomial")
+
+summary(modeloDico)
+#Se pone un . luego de ~ para poner todas las demás
+```
+
+[Miras a los coeficientes. La columna Pr(>|z|) es el p-valor]
+
+¿Cuáles ayudarían a que PPK gane? **Las positivas, y que tengan VALIDEZ MUESTRAL**.
+
+
+
+[En Marketing: o uno consolida su mercado, o uno construye su mercado]
+
+[Indecisos: construirías tu mercado]
+
+[Por ejemplo: candidatos que van a universidades, ¿reforzando su mercado cautivo?]
+
+[El reto de los equipos de campaña es decidir]
+
+***
+
+Revisar **Cumulative Var**
+

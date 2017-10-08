@@ -1,0 +1,216 @@
+---
+output:
+  html_document: default
+  html_notebook: default
+---
+
+#Clase 06
+
+Algunas cuestiones previas a tener en cuenta antes de comenzar la clase de hoy.
+
+##**LOCATION MATTERS!!**
+
+[Siempre ten una variable de ubicación. ¿Cuántas provincias están en la costa, por ejemplo?]
+
+
+**Desafortunadamente, nadie quiere aceptar que en el Perú NO HAY UNA POBLACIÓN.**
+
+* Asimismo, **no hay UNA población universitaria**.
+
+
+Problemas al trabajar con **índices**: riesgo que al sacar un ***promedio***, pierda información.
+
+[Ejemplo: quien saca 11 y 12 con mayores condiciones previas *versus* quien saca 01 y 08 con las peores condiciones.]
+
+
+Ahora... **¿qué pasa cuando ASUMIMOS NORMALIDAD?**
+
+**ANÁLISIS CATEGÓRICO** --> **TÉCNICAS NO PARAMÉTRICAS**
+
+
+¡¡Dale importancia a las curvas raras, a las sesgadas!!
+
+
+Al promediar... estoy normalizando.
+
+https://inteligenciaperu.github.io/Estadistica/
+
+Diferenciar entre CHARACTER y FACTOR:
+
+* CHARACTER: no es variable
+
+* FACTOR: es categórico, pero varía
+
+***
+
+Ahora sí:
+
+Empecemos la clase...
+
+#**Exploración Dimensional**
+
+Carguemos la data:
+
+```{r}
+folder='data'
+fileName='idePeru2012.csv'
+fileToRead=file.path(folder,fileName)
+ide12=read.csv(fileToRead,strip.white = T)
+```
+
+Veamos estructura:
+
+```{r}
+str(ide12)
+```
+
+Sabiendo que varias columnas no tienen el formato adecuado:
+
+```{r}
+ide12=read.csv(fileToRead,strip.white = T,
+                 colClasses=c(rep('character',4),
+                              rep('numeric',7),
+                              rep('factor',3)))
+```
+
+Ahora:
+
+```{r}
+str(ide12)
+```
+
+La variable TAMANO debe ser ordinal:
+
+```{r}
+ide12$TAMANO=as.ordered(ide12$TAMANO)
+```
+
+##Mapa de similitudes
+
+Cuando hacemos *análisis de conglomerados* asignamos cada provincia a un grupo. Pero a veces queremos ver **cómo la distancia entre estas se puede representar**. Es decir, si usamos las distancias entre ellas, ¿cómo sería ese mapa? Responder esta pregunta implica que creemos un mapa de provincias, pero **NO uno geográfico**, sino un mapa ***donde los distritos más similares en IDE estén más cerca***.
+
+Crear mapas basados en multiples valores es el objetivo del **escalamiento multidimensional**. Las múltiples variables serán los componentes del IDE:
+
+```{r}
+# Aquí están los componentes
+provMap=ide12[,c(6:10)]
+
+# Viendo resultado:
+head(provMap)
+```
+
+El subconjunto de de arriba está bien, pero necesitamos que haya alguna manera de identificar las provincias. De ahi que mejor reemplazamos los numeros de fila por el ubigeo:
+
+```{r}
+row.names(provMap)=ide12$ubiProv
+
+#viendo:
+head(provMap)
+```
+
+Evidentemente, el nombre de fila debe ser único, y el ubigeo cumple esa característica.
+
+Ahora nos toca hacer un par de pasos conocidos:
+
+```{r}
+# normalizar:
+provMap_s=scale(provMap)
+
+# hallar las distancias entre las provincias:
+provMap_d=dist(provMap_s)
+```
+
+Aquí, *en vez de calcular pertenencia a algún cluster*, nos vamos a crear el **mapa de similitudes**:
+
+```{r}
+provMap_r <- cmdscale(provMap_d,eig=TRUE, k=2) # k sugiere dimensiones
+provMap_r$GOF # mientras mas cerca a 1 mejor.
+```
+
+Rápidamente, podemos ver la posición de los puntos creados:
+
+```{r}
+titulo="Mapa de Similitudes entre provincias del Perú basado en el IDE"
+x <- provMap_r$points[,1]
+y <- provMap_r$points[,2]
+plot(x, y, main=titulo)
+```
+
+Este mapa necesita decoraciones. Primero, mostremos las etiquetas en vez de puntos:
+
+```{r}
+plot(x, y, xlab="Dimensión 1", ylab="Dimensión 2", main=titulo, 
+     type="n") # 'n' evita que se pongan los puntos.
+# etiquetas y colores de los puntos
+columnForLabels=dimnames(provMap_r[[1]])[[1]]
+text(x, y,labels = columnForLabels)
+```
+
+Si quisieramos nombres en vez de ubigeos:
+
+```{r}
+plot(x, y, xlab="Dimensión 1", ylab="Dimensión 2", main=titulo, 
+     type="n") # 'n' evita que se pongan los puntos.
+# etiquetas y colores de los puntos
+columnForLabels=ide12$PROVINCIA
+text(x, y,labels = columnForLabels, cex = 0.5) 
+```
+
+Los nombres nos dan una idea de como se acercan unas provincias a otras. Podriamos colorear para dar más información:
+
+```{r}
+plot(x, y, xlab="Dimensión 1", ylab="Dimensión 2", main=titulo, 
+     type="n") # 'n' evita que se pongan los puntos.
+# etiquetas y colores de los puntos
+columnForLabels=ide12$PROVINCIA
+colorForLabels=ide12$COSTA
+paleta=c('grey','blue')
+text(x, y,labels = columnForLabels, cex = 0.8, col = paleta[colorForLabels]) 
+legend("bottomright", legend = levels(colorForLabels),
+       fill = paleta,title = "Tiene Costa?")
+```
+
+Podemos 'agregar' los datos por region:
+
+```{r}
+regionIde12=aggregate(cbind(IDENTIDAD,SALUD, EDUCACION,SANEAMIENTO, ELECTRIFICACION) ~ DEPARTAMENTO,data=ide12,FUN=mean)
+regionIde12
+```
+
+Tenemos un nuevo data frame, hagamos el mismo tipo de trabajo:
+
+```{r}
+# subset:
+regMap=regionIde12[,-1]
+
+# renombrar fila
+row.names(regMap)=regionIde12[,1]
+
+# normalizar:
+regMap_s=scale(regMap)
+
+# hallar distancias entre ellos:
+regMap_d=dist(regMap_s)
+
+# calcular:
+regMap_r = cmdscale(regMap_d,eig=TRUE, k=2) #
+```
+
+Verificando qué tan bueno es resultado:
+
+```{r}
+regMap_r$GOF # mientras mas cerca a 1 mejor.
+```
+
+Con ese resultado, podemos crear otro mapa:
+
+```{r}
+labelsMap=row.names(regMap)
+x <- regMap_r$points[,1]
+y <- regMap_r$points[,2]
+plot(x, y,  main="Mapa IED nivel regiones", type="n")
+text(x, y, labels = labelsMap, cex=.5) 
+```
+
+***
+

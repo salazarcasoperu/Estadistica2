@@ -1,0 +1,220 @@
+
+
+```{r}
+suma=function(x,y,z=10){resultado=x+y+z
+resultado
+}
+
+```
+##**OJO**: de preferencia cierra la llave } en una fila adicional.
+Y antes de que empiece una palabra, **presiona ENTER**.
+
+```{r}
+suma(4,5,9)
+```
+
+```{r}
+suma(100,1)
+```
+
+```{r}
+suma(100,1,100)
+```
+
+
+#**CREA TU VARIABLE ExploraNominal**
+
+```{r}
+lasuma=function(vectorx){
+  resultado=sum(vectorx)
+  resultado
+}
+```
+
+```{r}
+# # where am I?
+getwd()
+```
+
+file.path
+
+```{r}
+folder="data"
+fileName="LAPOP2014.sav"
+fileToRead=file.path(folder,fileName)
+```
+
+Leyendo SPSS
+
+```{r}
+#install 'haven' first! (se toma su tiempo!)
+library(haven)
+folder="data"
+fileName="LAPOP2014.sav"
+fileToRead=file.path(folder,fileName)
+dataSpss=read_sav(fileToRead)
+
+```
+Creando dataframe
+
+```{r}
+varsOfInterest=c(56:73)
+dataSpssSub=as.data.frame(dataSpss)[varsOfInterest]
+head(dataSpssSub)
+```
+
+#**EXPLORANDO CONTEOS**
+
+```{r}
+dataSpssSub$b21
+```
+
+Elimino perdidos [o, ¿me quedo solo con números?]:
+
+```{r}
+library(stringr)
+
+# preparar 'regular expression'
+regexp <- "[[:digit:]]+"
+
+# procesando string
+dataSpssSub$b21=str_extract(dataSpssSub$b21, regexp)
+dataSpssSub$b21=as.numeric(dataSpssSub$b21)
+dataSpssSub$b21
+```
+
+
+
+Gráfico de barras:
+
+```{r}
+ggplot(dataSpssSub, aes(b21)) + geom_bar()
+```
+
+Veamos sus estadísticos:
+
+```{r}
+summary(dataSpssSub$b21)
+```
+
+Un boxplot:
+
+```{r}
+ggplot(dataSpssSub, aes(x = 1, y = b21)) + geom_boxplot() +coord_flip()
+```
+
+Abriendo EDA:
+
+```{r}
+#install 'haven' first! (se toma su tiempo!)
+library(haven)
+folder="data"
+fileName="EDA.sav"
+fileToRead=file.path(folder,fileName)
+EDA=read_sav(fileToRead)
+```
+
+###**EXPLORANDO VARIABLE DICOTÓMICA** (*sexo*):
+
+Tabla de frecuencias:
+
+```{r}
+table(EDA$sexo)
+```
+
+Etiquetas de variable:
+
+```{r}
+# la variable sexo está codificada con valores 1 y 2
+# queremos poner las etiquetas de valor 1=Hombre, 2=Mujer
+
+EDA$sexo <- factor(EDA$sexo,
+levels = c(1,2),
+labels = c("Hombre", "Mujer"))
+```
+
+Nuevamente, tabla de frecuencias:
+
+```{r}
+table(EDA$sexo)
+```
+
+De manera gráfica:
+
+```{r}
+toPlot=table(EDA$sexo)
+barplot(toPlot,col='lightblue',
+        xlab='Sexo',
+        ylab='Conteo de personas',
+        main='Distribución de sexo de lxs encuestadxs')
+```
+
+Para verlo como porcentajes tenemos:
+
+```{r}
+prop.table(table(EDA$sexo)) # como plotearias estos resultados?
+```
+
+Es útil saber si la diferencia es significativa usando la prueba chi-cuadrado:
+
+```{r}
+distribution=table(EDA$sexo)
+chisq.test(distribution)
+```
+
+Un valor significativo del p-value (menor a 0.05) sugiere que hay diferencias (se rechaza que haya comportamiento uniforme).
+
+En esta situación, podemos considerar que la moda es relevante:
+
+```{r}
+names(distribution[which.max(distribution)])
+```
+
+###**EXPLORANDO VARIABLE DICOTÓMICA** (*region*):
+
+Exploremos la región de lxs entrevistadxs:
+
+```{r}
+table(EDA$region)
+```
+
+Etiquetas de valor:
+
+```{r}
+EDA$region <- factor(EDA$region,
+levels = c(1,2,3,4),
+labels = c("Noreste", "Norte Centro", "Sur", "Oeste"))
+```
+
+Ahora sí la tabla:
+
+```{r}
+table(EDA$region)
+```
+
+Gráfico:
+
+```{r}
+toPlot=table(EDA$region)
+barplot(toPlot,col='magenta',
+        xlab='Región',
+        ylab='Conteo de personas',
+        main='Distribución de región de nacimiento en lxs encuestadxs',
+        las=2)
+```
+
+Veamos la relevancia de la moda:
+
+```{r}
+distribution=table(EDA$region)
+chisq.test(distribution)
+```
+
+Analicemos *relig* (religion). Primero las etiquetas de valor:
+
+```{r}
+EDA$relig <- factor(EDA$relig,
+levels = c(1,2,3,7),
+labels = c("Protestante", "Católica", "Judía", "Otro"))
+```
+

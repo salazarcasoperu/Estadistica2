@@ -1,0 +1,56 @@
+#Clase 07
+
+###**MATRICES**
+
+***
+
+###**Cómo limpiar data en Excel**
+
+Primero: **BORRAR DATA QUE NO NECESITA**
+
+**openxlsx**: sí te elimina las columnas vacías
+
+**readxls**: no te eilimina las columnas vacías
+
+
+El profesor nos brinda herramientas para poder trabajar con ***casos infinitos***.
+
+
+**¡BUSCA EL PATRÓN!**
+
+[Si lo encuentras, quiere decir que puedes usar el sort].
+
+¿Qué es el SORT? ---> DATOS / ORDENAR / Mis datos tienen encabezado
+
+**El ubigeo es nuestra ancla**
+
+Ctrl + Z
+
+Ctrl + Y
+
+
+"Ordenar como número todo lo que parezca número"
+
+
+
+Columna de DEPARTAMENTOs: ¡distritos que son capital de la provincia!
+
+1 --> capital
+0 --> el resto
+
+ubiDEP
+
+con =IZQUIERDA(celda,2)&"0000"
+
+**merge difuso**
+
+Pegar VALORES.
+
+Sacando el nombre de DEPARTAMENTOS:
+
+=BUSCARV(A2,$O$1:$P$24,2,0)
+
+Sacando el nombre de PROVINCIAS:
+
+=BUSCARV()
+

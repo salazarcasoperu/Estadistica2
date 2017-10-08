@@ -1,0 +1,34 @@
+#Clase 08
+
+* Cross-sectional [Longitudinal]
+
+* Longitudinal
+
+
+Exploración y construcción de **indicadores compuestos**.
+
+* Variables latentes [no confundir con variables proxy]
+
+
+Correlaciones
+
+***
+
+Para el trabajo, podría hacer clusters por distritos.
+
+[Usa la categórica para pintar]
+
+***
+
+**Análisis de Correspondencias**
+
+Las relaciones muy cercanas al cero no existen.
+
+Con las lejanas... **Mira el ángulo**
+
+OJO: **ESTO ES REFERENCIAL**
+
+***
+
+**Análisis de componentes principales**
+
