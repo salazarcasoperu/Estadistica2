@@ -7,6 +7,7 @@ Espero que esta web te sea de ayuda. Cualquier duda, sugerencia, o comentario (�
 <a href="https://rawgit.com/salazarcasoperu/Estadistica2/master/clase02.html" target="_blank">Prueba</a>
 
 ____
+
 # Estadística para el Análisis Político 2 
 
 ## Contenidos
@@ -26,7 +27,7 @@ ____
  	<td rowspan="2">Exploración de datos</td>
  	<td> Estadística e Investigación</td>
  	<td> Revisión del Syllabus. 
- 	<br> <a href="https://rawgit.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/master/sesiones/DataCollection_class_Peru.html" target="_blank">Recolección de Datos</a>.</br> 
+ 	<br> <a href="https://rawgit.com/PoliticayGobiernoPUCP/EstadisticaPoliticaGobiernoII/master/sesiones/DataCollection_class_Peru.html" target="_blank">Recolección de Datos</a>. 
  	</td>
  </tr>
  
